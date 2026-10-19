@@ -12,7 +12,9 @@ import {
   X,
   Lock,
   Search,
-  CheckCircle2
+  CheckCircle2,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 export default function AdminUsersPage() {
@@ -21,11 +23,22 @@ export default function AdminUsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<UserRole>('guru');
   const [nip, setNip] = useState('');
 
   const refreshUsers = () => {
     setUsers(StorageService.getUsers());
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setName('');
+    setEmail('');
+    setPassword('');
+    setShowPassword(false);
+    setNip('');
   };
 
   const handleToggleStatus = (u: User) => {
@@ -42,26 +55,24 @@ export default function AdminUsersPage() {
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim()) return;
+    if (!name.trim() || !email.trim() || !password.trim()) return;
 
     const newUser: User = {
       id: `user-${Date.now()}`,
       name: name.trim(),
       email: email.trim(),
+      password: password.trim(),
       role,
       status: 'active',
       nip: nip.trim() || '19900101 202001 1 001',
       schoolId: 'school-1',
-      title: role === 'guru' ? 'Guru PAI' : role === 'kepala_sekolah' ? 'Kepala Sekolah' : 'Pengawas'
+      title: role === 'guru' ? 'Guru PAI' : role === 'kepala_sekolah' ? 'Kepala Sekolah' : role === 'pengawas' ? 'Pengawas' : 'Administrator Sistem'
     };
 
     const updated = [...users, newUser];
     StorageService.saveUsers(updated);
     setUsers(updated);
-    setIsModalOpen(false);
-    setName('');
-    setEmail('');
-    setNip('');
+    handleCloseModal();
   };
 
   const filtered = users.filter(u =>
@@ -215,7 +226,7 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Modal Tambah Pengguna */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Tambah Akun Pengguna Baru">
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal} title="Tambah Akun Pengguna Baru">
         <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <div className="form-group">
             <label className="form-label">Nama Lengkap &amp; Gelar</label>
@@ -239,6 +250,47 @@ export default function AdminUsersPage() {
               onChange={e => setEmail(e.target.value)}
               required
             />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">
+              Kata Sandi (Password) <span style={{ color: '#EF4444' }}>*</span>
+            </label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="form-input"
+                placeholder="Minimal 6 karakter"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                minLength={6}
+                style={{ paddingRight: '40px' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#64748B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '4px'
+                }}
+                title={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+            <span style={{ fontSize: '11px', color: '#64748B', marginTop: '4px', display: 'block' }}>
+              Kata sandi awal untuk akses login pengguna baru
+            </span>
           </div>
 
           <div className="form-group">
@@ -267,7 +319,7 @@ export default function AdminUsersPage() {
           </div>
 
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '8px' }}>
-            <button type="button" className="btn btn-outline" onClick={() => setIsModalOpen(false)}>
+            <button type="button" className="btn btn-outline" onClick={handleCloseModal}>
               Batal
             </button>
             <button type="submit" className="btn btn-primary">

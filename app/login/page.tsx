@@ -15,6 +15,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { initialUsers } from '@/data/initialData';
+import { StorageService } from '@/services/storage';
 
 function LoginForm() {
   const router = useRouter();
@@ -33,10 +34,11 @@ function LoginForm() {
 
   // Quick fill preset credentials for evaluation
   const handleQuickPreset = (role: 'guru' | 'kepala_sekolah' | 'pengawas' | 'admin') => {
-    const user = initialUsers.find(u => u.role === role);
+    const storedUsers = typeof window !== 'undefined' ? StorageService.getUsers() : initialUsers;
+    const user = storedUsers.find(u => u.role === role) || initialUsers.find(u => u.role === role);
     if (user) {
       setEmail(user.email);
-      setPassword('Supervisi2026!');
+      setPassword(user.password || 'Supervisi2026!');
       setErrorMessage('');
     }
   };
@@ -48,7 +50,9 @@ function LoginForm() {
 
     try {
       // Find matching user in system
-      const targetUser = initialUsers.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
+      const storedUsers = typeof window !== 'undefined' ? StorageService.getUsers() : initialUsers;
+      const targetUser = storedUsers.find(u => u.email.toLowerCase() === email.trim().toLowerCase())
+        || initialUsers.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
 
       if (!targetUser) {
         setErrorMessage('Kredensial login tidak valid. Pastikan email terdaftar pada dinas/sekolah.');
@@ -58,6 +62,13 @@ function LoginForm() {
 
       if (targetUser.status !== 'active') {
         setErrorMessage('Akun Anda dinonaktifkan oleh administrator. Silakan hubungi admin sekolah.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Check password if configured on user
+      if (targetUser.password && targetUser.password !== password) {
+        setErrorMessage('Kata sandi salah. Silakan periksa kembali kata sandi Anda.');
         setIsLoading(false);
         return;
       }

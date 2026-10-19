@@ -20,7 +20,9 @@ import {
   Search,
   Check,
   X,
-  Info
+  Info,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -41,8 +43,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [newUserName, setNewUserName] = useState('');
   const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
+  const [showUserPassword, setShowUserPassword] = useState(false);
   const [newUserRole, setNewUserRole] = useState<UserRole>('guru');
   const [newUserNip, setNewUserNip] = useState('');
+
+  const resetUserForm = () => {
+    setIsUserModalOpen(false);
+    setNewUserName('');
+    setNewUserEmail('');
+    setNewUserPassword('');
+    setShowUserPassword(false);
+    setNewUserNip('');
+  };
 
   const refreshAll = () => {
     setUsers(StorageService.getUsers());
@@ -90,8 +103,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Create new user (SRS-F-1.4)
   const handleCreateUser = () => {
-    if (!newUserName.trim() || !newUserEmail.trim()) {
-      alert('Nama dan Email wajib diisi!');
+    if (!newUserName.trim() || !newUserEmail.trim() || !newUserPassword.trim()) {
+      alert('Nama, Email, dan Kata Sandi wajib diisi!');
       return;
     }
 
@@ -99,11 +112,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       id: `user-${Date.now()}`,
       name: newUserName.trim(),
       email: newUserEmail.trim(),
+      password: newUserPassword.trim(),
       role: newUserRole,
       status: 'active',
       nip: newUserNip.trim() || '19900101 202001 1 001',
       schoolId: 'school-1',
-      title: newUserRole === 'guru' ? 'Guru PAI' : newUserRole === 'kepala_sekolah' ? 'Kepala Sekolah' : 'Pengawas'
+      title: newUserRole === 'guru' ? 'Guru PAI' : newUserRole === 'kepala_sekolah' ? 'Kepala Sekolah' : newUserRole === 'pengawas' ? 'Pengawas' : 'Administrator Sistem'
     };
 
     const updated = [...users, newUser];
@@ -121,10 +135,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     });
 
     onShowToast(`Pengguna baru ${newUser.name} (${newUser.role}) berhasil ditambahkan!`, 'success');
-    setIsUserModalOpen(false);
-    setNewUserName('');
-    setNewUserEmail('');
-    setNewUserNip('');
+    resetUserForm();
   };
 
 
@@ -558,14 +569,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Modal Add User */}
       <Modal
         isOpen={isUserModalOpen}
-        onClose={() => setIsUserModalOpen(false)}
+        onClose={resetUserForm}
         title="Tambah Akun Pengguna Baru"
         footer={
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', width: '100%' }}>
             <button
               type="button"
               className="btn btn-outline"
-              onClick={() => setIsUserModalOpen(false)}
+              onClick={resetUserForm}
             >
               Batal
             </button>
@@ -605,6 +616,45 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               onChange={e => setNewUserEmail(e.target.value)}
               placeholder="nama@sekolah.belajar.id"
             />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">
+              Kata Sandi (Password) <span className="required">*</span>
+            </label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showUserPassword ? 'text' : 'password'}
+                className="form-input"
+                value={newUserPassword}
+                onChange={e => setNewUserPassword(e.target.value)}
+                placeholder="Minimal 6 karakter"
+                style={{ paddingRight: '40px' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowUserPassword(!showUserPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#64748B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '4px'
+                }}
+                title={showUserPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+              >
+                {showUserPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+            <span style={{ fontSize: '11px', color: '#64748B', marginTop: '4px', display: 'block' }}>
+              Kata sandi awal untuk akses login pengguna baru
+            </span>
           </div>
 
           <div className="form-group">
