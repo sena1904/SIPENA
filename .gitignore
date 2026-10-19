@@ -1,0 +1,20 @@
+# dependencies
+node_modules/
+
+# next.js & vite build
+.next/
+dist/
+build/
+out/
+
+# environment
+.env
+.env.local
+.env*.local
+
+# typescript & cache
+*.tsbuildinfo
+next-env.d.ts
+graphify-out/
+__pycache__/
+*.pyc
