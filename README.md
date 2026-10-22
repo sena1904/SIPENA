@@ -90,4 +90,4 @@ Aplikasi menyediakan **Mode Simulasi RBAC** di bilah atas untuk menguji alur ker
 1. **Ahmad Dahlan, S.Pd.I** (`guru`): Buat modul ajar, simpan draf otomatis, kirim pengajuan.
 2. **Drs. H. Suryanto, M.Pd** (`kepala_sekolah`): Verifikasi berkas, kirim catatan revisi, nilai indikator observasi, sahkan laporan.
 3. **Dra. Hj. Siti Fatimah, M.Pd** (`pengawas`): Rekap multi-sekolah, tinjau PDF resmi, tetapkan tindak lanjut.
-4. **M. Fathurrahman, S.Kom** (`admin`): Manajemen pengguna, versioning instrumen, log integrasi Google & retry, audit trail.
+4. **Muchsin Alatas, L.c** (`admin`): Manajemen pengguna, versioning instrumen, log integrasi Google & retry, audit trail.

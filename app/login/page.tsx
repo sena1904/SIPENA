@@ -12,7 +12,8 @@ import {
   Award,
   Compass,
   ShieldCheck,
-  CheckCircle2
+  CheckCircle2,
+  RotateCcw
 } from 'lucide-react';
 import { initialUsers } from '@/data/initialData';
 import { StorageService } from '@/services/storage';
@@ -37,9 +38,22 @@ function LoginForm() {
     const storedUsers = typeof window !== 'undefined' ? StorageService.getUsers() : initialUsers;
     const user = storedUsers.find(u => u.role === role) || initialUsers.find(u => u.role === role);
     if (user) {
+      if (user.status !== 'active') {
+        user.status = 'active';
+        StorageService.saveUsers(storedUsers.map(u => u.id === user.id ? { ...u, status: 'active' } : u));
+      }
       setEmail(user.email);
       setPassword(user.password || 'Supervisi2026!');
       setErrorMessage('');
+    }
+  };
+
+  const handleResetData = () => {
+    if (typeof window !== 'undefined') {
+      StorageService.resetAll();
+      setErrorMessage('');
+      alert('Data simulasi berhasil direset ke kondisi awal.');
+      window.location.reload();
     }
   };
 
@@ -60,7 +74,10 @@ function LoginForm() {
         return;
       }
 
-      if (targetUser.status !== 'active') {
+      if (targetUser.role === 'admin' && targetUser.status !== 'active') {
+        targetUser.status = 'active';
+        StorageService.saveUsers(storedUsers.map(u => u.id === targetUser.id ? { ...u, status: 'active' } : u));
+      } else if (targetUser.status !== 'active') {
         setErrorMessage('Akun Anda dinonaktifkan oleh administrator. Silakan hubungi admin sekolah.');
         setIsLoading(false);
         return;
@@ -272,6 +289,28 @@ function LoginForm() {
               >
                 <ShieldCheck size={14} color="#DC2626" />
                 <span>Administrator</span>
+              </button>
+            </div>
+
+            <div style={{ marginTop: '14px', textAlign: 'center' }}>
+              <button
+                type="button"
+                onClick={handleResetData}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--color-muted-foreground)',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  textDecoration: 'underline'
+                }}
+                title="Pulihkan seluruh data simulasi ke kondisi awal"
+              >
+                <RotateCcw size={12} />
+                <span>Pulihkan / Reset Data Simulasi</span>
               </button>
             </div>
           </div>

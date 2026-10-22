@@ -89,7 +89,7 @@ export const initialUsers: User[] = [
   },
   {
     id: 'user-admin-1',
-    name: 'M. Fathurrahman, S.Kom',
+    name: 'Muchsin Alatas, L.c',
     email: 'admin.sipena@kemenag.go.id',
     role: 'admin',
     status: 'active',

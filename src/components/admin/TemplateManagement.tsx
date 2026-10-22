@@ -55,7 +55,7 @@ export const TemplateManagement: React.FC<TemplateManagementProps> = ({
 
   const adminActor = currentUser || StorageService.getCurrentUser() || {
     id: 'admin-1',
-    name: 'M. Fathurrahman, S.Kom',
+    name: 'Muchsin Alatas, L.c',
     role: 'admin' as const
   };
 
